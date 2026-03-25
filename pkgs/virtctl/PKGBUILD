@@ -1,6 +1,6 @@
 # Maintainer: Mark Wells <contact at markwells dot dev>
 pkgname=virtctl
-pkgver=1.7.2
+pkgver=1.8.0
 pkgrel=1
 pkgdesc="Kubernetes Virtualization API and runtime in order to define and manage virtual machines (CLI)"
 arch=('x86_64')
