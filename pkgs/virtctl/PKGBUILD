@@ -9,7 +9,7 @@ license=('Apache')
 provides=('virtctl')
 conflicts=('virtctl-bin')
 source=("https://github.com/kubevirt/kubevirt/releases/download/v${pkgver}/virtctl-v${pkgver}-linux-amd64")
-sha512sums=('5394b5f7ba177c16a0f41ec13b089f8098e4dd5c152d15258581c5e18e4fe301ab61f8450b0a3dd3b193f5d1662b0f02e96985c4b78260bf430db25d3fe9434b')
+sha512sums=('d022d420e014c2c16805c7988dc98a1f5cf84d9a3acbf620c0cf8a1911f94a6222e56adf05ca59aeffb08ddbcc4b047d16e234ae16863b41c66136cc7ab60c9f')
 
 package() {
     install -Dm755 "${srcdir}/virtctl-v${pkgver}-linux-amd64" "${pkgdir}/usr/bin/virtctl"
