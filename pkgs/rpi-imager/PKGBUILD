@@ -1,6 +1,6 @@
 # Maintainer: Mark Wells <contact at markwells dot dev>
 pkgname=rpi-imager
-pkgver=2.0.7
+pkgver=2.0.8
 pkgrel=1
 pkgdesc="Raspberry Pi Imaging Utility (AppImage)"
 arch=('x86_64')
