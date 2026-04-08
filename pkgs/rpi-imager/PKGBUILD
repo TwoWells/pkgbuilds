@@ -12,7 +12,7 @@ conflicts=('rpi-imager')
 options=('!strip' '!debug')
 source=("Raspberry_Pi_Imager-v${pkgver}-desktop-x86_64.AppImage::https://github.com/raspberrypi/rpi-imager/releases/download/v${pkgver}/Raspberry_Pi_Imager-v${pkgver}-desktop-x86_64.AppImage"
     "com.raspberrypi.rpi-imager.policy::https://raw.githubusercontent.com/raspberrypi/rpi-imager/v${pkgver}/debian/com.raspberrypi.rpi-imager.policy")
-sha256sums=('176f6a73b8ee7efb2ce07fbd9c296c497fba6e344b45d2e78ebbe0460e88325a'
+sha256sums=('700519cd01b0a2a085ac73a0e7d4a962853bdb60f091408f0fd4359ce6968110'
             'f998b4c8da419da3a453a3b8992397fb4b8687b7155eda1c79aa0d7a0eb4e524')
 noextract=("Raspberry_Pi_Imager-v${pkgver}-desktop-x86_64.AppImage")
 
