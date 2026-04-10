@@ -13,6 +13,7 @@ depends=(
     'vapoursynth'
     'vapoursynth-plugin-mvtools'
     'vapoursynth-plugin-misc-git'
+    'vapoursynth-plugin-mvsfunc-git'
 )
 optdepends=(
     'vapoursynth-plugin-bestsource: Recommended source filter'
