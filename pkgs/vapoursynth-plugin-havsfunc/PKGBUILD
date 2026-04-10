@@ -1,0 +1,43 @@
+# Maintainer: Mark Wells <contact at markwells dot dev>
+# Contributor: HurricanePootis (AUR vapoursynth-plugin-havsfunc)
+# shellcheck shell=bash disable=SC2034,SC2154
+# Pinned to r33: r34 removed QTGMC (moved to vsjetpack ecosystem, not yet usable)
+pkgname=vapoursynth-plugin-havsfunc
+pkgver=33
+pkgrel=1
+pkgdesc="Holy's ported AviSynth functions for VapourSynth (includes QTGMC)"
+arch=('any')
+url="https://github.com/HomeOfVapourSynthEvolution/havsfunc"
+license=('Unlicense')
+depends=(
+    'vapoursynth'
+    'vapoursynth-plugin-mvtools'
+    'vapoursynth-plugin-misc-git'
+)
+optdepends=(
+    'vapoursynth-plugin-bestsource: Recommended source filter'
+    'vapoursynth-plugin-fmtconv: Additional format conversion'
+)
+source=("$pkgname-$pkgver.tar.gz::https://github.com/HomeOfVapourSynthEvolution/havsfunc/archive/refs/tags/r$pkgver.tar.gz"
+    "adjust.py::https://raw.githubusercontent.com/dubhatervapoursynth/vapoursynth-adjust/master/adjust.py"
+    "fix-mvtools-api.patch")
+sha512sums=('SKIP'
+    'SKIP'
+    'SKIP')
+provides=('vapoursynth-plugin-havsfunc' 'vapoursynth-plugin-adjust')
+conflicts=('vapoursynth-plugin-havsfunc-git' 'vapoursynth-plugin-havsfunc-light-git' 'vapoursynth-plugin-adjust-git')
+
+prepare() {
+    cd "havsfunc-r$pkgver"
+    patch -p1 < "$srcdir/fix-mvtools-api.patch"
+}
+
+package() {
+    cd "havsfunc-r$pkgver"
+    local site_packages
+    site_packages="$(python -c 'import site; print(site.getsitepackages()[0])')"
+    install -Dm644 havsfunc.py "$pkgdir/$site_packages/havsfunc.py"
+    install -Dm644 "$srcdir/adjust.py" "$pkgdir/$site_packages/adjust.py"
+    install -Dm644 -t "$pkgdir/usr/share/licenses/$pkgname/" README.md
+}
+# vim:set ts=2 sw=2 et:
