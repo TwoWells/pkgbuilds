@@ -10,5 +10,13 @@ fi
 
 sudo pacman -U --noconfirm "$PKG_FILE"
 
-python -c "import havsfunc; print('havsfunc imported successfully')"
-python -c "import adjust; print('adjust imported successfully')"
+site_packages="$(python -c 'import site; print(site.getsitepackages()[0])')"
+
+for f in havsfunc.py adjust.py; do
+    if [ -f "$site_packages/$f" ]; then
+        echo "$f installed at $site_packages/$f"
+    else
+        echo "Error: $f not found at $site_packages/$f"
+        exit 1
+    fi
+done
