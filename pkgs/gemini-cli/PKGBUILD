@@ -15,7 +15,7 @@ source=("https://registry.npmjs.org/@google/gemini-cli/-/${pkgname}-${pkgver}.tg
     "gemini-wrapper.sh")
 noextract=("${pkgname}-${pkgver}.tgz")
 sha512sums=('17d92821777d657d72bb630fc8cbe7c1badd7a198f20fa9cb58236772dde4ba10aab383c57cdcb3af6c0a4606aac829e735cf6b247e711b0bd0bab033647288f'
-            '6874b34f459bdcf2b78f67447cdf734adb2cc5f2e37229198f1359f187bf799451f77f9aaafc5f08e48f4b98175694affa767abac15e170c2af903ad9489f525')
+    'c89d415f624d9fe8472467b03c5cf2bb7db2a78e6fc6f3f55aca722d95f851dab2faf6dcf1c8d6fbe4ec29da14c257f5ee5d340964f7c3690cc02d8d6ec412be')
 
 package() {
     npm install -g --prefix "${pkgdir}/usr" \
