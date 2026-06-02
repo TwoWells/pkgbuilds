@@ -9,7 +9,7 @@ pkgdesc="NVIDIA proprietary kernel modules (DKMS)"
 arch=('x86_64')
 url="https://www.nvidia.com/"
 license=('custom')
-depends=('dkms' "nvidia-utils=${pkgver}" 'libglvnd')
+depends=('dkms' 'libglvnd')
 provides=('NVIDIA-MODULE' 'nvidia' 'nvidia-dkms' 'nvidia-open-dkms')
 conflicts=('NVIDIA-MODULE' 'nvidia' 'nvidia-open' 'nvidia-open-dkms')
 options=('!strip' '!debug')
@@ -43,6 +43,8 @@ DEST_MODULE_LOCATION[4]="/kernel/drivers/video"' dkms.conf
 }
 
 package() {
+    depends+=("nvidia-utils=${pkgver}")
+
     cd "${_pkg}"
 
     install -dm755 "${pkgdir}/usr/src"
