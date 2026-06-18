@@ -20,7 +20,7 @@ makedepends=(
     'python-setuptools'
 )
 source=("https://files.pythonhosted.org/packages/source/k/keeper_secrets_manager_core/keeper_secrets_manager_core-$pkgver.tar.gz")
-sha512sums=('a71a3053ce906a4dc77220e1be2362cde8dbb14782731c4f49c60499d9d1f1cbce6177ad199206df21df7fc51f60177e95beabaa5d287d6e8fb973fcaf3b98f2')
+sha512sums=('6dd974f4c34f527b1af515df15fc0d317b39936a77c41e899db9fef591cf65e6c68416f51072bdbf0fa4251ea4b44e0294b78cafc26e7caa148be679708cf7c8')
 
 build() {
     cd "keeper_secrets_manager_core-$pkgver"
