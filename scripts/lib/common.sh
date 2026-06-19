@@ -95,6 +95,21 @@ check_npm() {
     fi
 }
 
+check_cpan() {
+    local pkg_name="$1"
+    local dist_name="$2" # CPAN distribution name, e.g. Config-IniFiles
+    echo "Checking $pkg_name via CPAN (MetaCPAN)..."
+
+    local latest_ver
+    latest_ver=$(curl -s "https://fastapi.metacpan.org/v1/release/${dist_name}" | jq -r .version)
+
+    if [ -n "$latest_ver" ] && [ "$latest_ver" != "null" ]; then
+        perform_update "$pkg_name" "$latest_ver"
+    else
+        echo "Failed to check version for $pkg_name"
+    fi
+}
+
 check_github_release() {
     local pkg_name="$1"
     local repo="$2"
