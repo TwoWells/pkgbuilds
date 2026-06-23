@@ -3,6 +3,12 @@
 
 # Configuration
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# REPO_NAME is the pacman repository + database name (markwells-dev.db). It is
+# intentionally NOT GITHUB_ORG: the org was renamed to TwoWells, but the
+# published database is still markwells-dev. Do not rename it to match the org —
+# that breaks every installed user's pacman.conf and the [markwells-dev]
+# Server/database lookups. OLD_REPO_NAME is the pre-rename name, kept so old
+# databases can still be migrated.
 REPO_NAME="markwells-dev"
 OLD_REPO_NAME="mark-wells-dev"
 GITHUB_ORG="TwoWells"

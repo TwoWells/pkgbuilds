@@ -41,10 +41,12 @@ Common flags:
 
 ### Updating Checksums
 
-If you change source URLs or manually bump versions:
+If you change source URLs or manually bump versions, re-pin the checksums.
+`SKIP` is rejected by the `forbid-checksum-skip` pre-commit hook, so checksums
+must be real:
 
 ```bash
-updpkgsums
+make checksums PKG=<name>   # or: cd pkgs/<name> && updpkgsums
 ```
 
 ## Repository Structure
@@ -71,6 +73,13 @@ pkgs/
 | -------- | ------------------------------------ |
 | `.local` | Build and publish to GitHub releases |
 | `.aur`   | Push PKGBUILD to AUR                 |
+
+> **Repository name:** the pacman repo and its database are named
+> `markwells-dev` (`markwells-dev.db`), set via `REPO_NAME` in
+> `scripts/lib/common.sh`. This is intentionally _not_ the GitHub org name
+> (`TwoWells`): the org was renamed, the published database was not. Do not
+> rename it to match the org — that breaks installed users' `pacman.conf` and
+> the `[markwells-dev]` Server/database lookups.
 
 ## Adding a New Package
 
