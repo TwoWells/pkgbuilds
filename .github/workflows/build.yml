@@ -22,6 +22,12 @@ concurrency:
 
 jobs:
   prepare:
+    # Fork (untrusted) PRs must never run on the self-hosted pool — building
+    # arbitrary PKGBUILDs is RCE on the runner host. Only push/dispatch and
+    # same-repo (trusted) PRs run here; a fork PR skips `prepare`, which cascades
+    # to skip build/build-heavy/publish. Add a separate ubuntu-latest workflow if
+    # you want fork-PR CI.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
     container: archlinux:base-devel
     permissions:
