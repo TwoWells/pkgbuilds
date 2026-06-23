@@ -2,14 +2,30 @@
 
 This guide provides instructions for building, testing, and adding packages to this repository.
 
-For detailed documentation, see the [wiki](https://github.com/MarkWells-Dev/pkgbuilds/wiki):
+For detailed documentation, see the [wiki](https://github.com/TwoWells/pkgbuilds/wiki):
 
-- [CI/CD Pipeline](https://github.com/MarkWells-Dev/pkgbuilds/wiki/CI-CD) — build pipeline, auto-repair, atomic releases
-- [Build Patterns](https://github.com/MarkWells-Dev/pkgbuilds/wiki/Build-Patterns) — npm, Python, AppImage, and binary packaging
+- [CI/CD Pipeline](https://github.com/TwoWells/pkgbuilds/wiki/CI-CD) — build pipeline, auto-repair, atomic releases
+- [Build Patterns](https://github.com/TwoWells/pkgbuilds/wiki/Build-Patterns) — npm, Python, AppImage, and binary packaging
 
 ## Development Environment
 
 These instructions assume you are using Arch Linux.
+
+### Make targets
+
+A `Makefile` wraps the common workflows (run `make help` for the full list).
+Per-package targets take `PKG=<name>`:
+
+```bash
+make build PKG=themis     # makepkg -sf
+make test PKG=themis-bin  # build, then run check.sh smoke test
+make checksums PKG=themis # updpkgsums
+make srcinfo PKG=themis   # regenerate .SRCINFO
+```
+
+Repo-wide: `make fmt` (shfmt), `make shellcheck`, `make lint` (full CI lint),
+and `make pre-commit`. These mirror the CI and pre-commit configuration, so
+passing them locally matches what CI runs.
 
 ### Building Packages Locally
 
@@ -59,7 +75,7 @@ pkgs/
 ## Adding a New Package
 
 1. Create directory in `pkgs/` (name must match `pkgname`)
-2. Add `PKGBUILD` following appropriate [build pattern](https://github.com/MarkWells-Dev/pkgbuilds/wiki/Build-Patterns)
+2. Add `PKGBUILD` following appropriate [build pattern](https://github.com/TwoWells/pkgbuilds/wiki/Build-Patterns)
 3. Add target marker (`.local`, `.aur`, or both)
 4. Add `check.sh` smoke test (for `.local` packages)
 5. Add version check script in `scripts/packages/[pkgname].sh`

@@ -13,6 +13,8 @@ pkgs/**/*.AppImage
 pkgs/**/*.policy
 pkgs/**/*-linux-amd64
 pkgs/**/*-linux-x86_64
+pkgs/**/*.run
+pkgs/**/LICENSE-*
 
 # Repo database
 *.db

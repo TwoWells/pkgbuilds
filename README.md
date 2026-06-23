@@ -1,7 +1,7 @@
 # pkgbuilds
 
-[![Build packages](https://github.com/markwells-dev/pkgbuilds/actions/workflows/build.yml/badge.svg)](https://github.com/markwells-dev/pkgbuilds/actions/workflows/build.yml)
-[![Check for Updates](https://github.com/markwells-dev/pkgbuilds/actions/workflows/watch.yml/badge.svg)](https://github.com/markwells-dev/pkgbuilds/actions/workflows/watch.yml)
+[![Build packages](https://github.com/TwoWells/pkgbuilds/actions/workflows/build.yml/badge.svg)](https://github.com/TwoWells/pkgbuilds/actions/workflows/build.yml)
+[![Check for Updates](https://github.com/TwoWells/pkgbuilds/actions/workflows/watch.yml/badge.svg)](https://github.com/TwoWells/pkgbuilds/actions/workflows/watch.yml)
 
 Personal Arch Linux package repository with automated builds and version tracking.
 
@@ -15,7 +15,7 @@ sudo pacman-key --lsign-key ED9FEE0BB96D6A5E
 # Add to /etc/pacman.conf (before [core] for priority over official packages)
 [markwells-dev]
 SigLevel = Required DatabaseOptional
-Server = https://github.com/markwells-dev/pkgbuilds/releases/latest/download
+Server = https://github.com/TwoWells/pkgbuilds/releases/latest/download
 
 # Sync and install
 sudo pacman -Sy
@@ -40,7 +40,7 @@ sudo pacman -S <package-name>
 - **Packages are signed** with GPG and published atomically to GitHub Releases
 - **pacman** syncs directly from the release assets
 
-For CI/CD pipeline details, see the [wiki](https://github.com/MarkWells-Dev/pkgbuilds/wiki/CI-CD).
+For CI/CD pipeline details, see the [wiki](https://github.com/TwoWells/pkgbuilds/wiki/CI-CD).
 
 ## Adding a New Package
 
