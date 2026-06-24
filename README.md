@@ -24,13 +24,9 @@ sudo pacman -S <package-name>
 
 ## Packages
 
-| Package                    | Source   | Description                   |
-| -------------------------- | -------- | ----------------------------- |
-| gemini-cli                 | npm      | Google's Gemini AI CLI agent  |
-| keeper-commander           | PyPI     | Keeper Password Manager CLI   |
-| keeper-secrets-manager-cli | PyPI     | Keeper Secrets Manager CLI    |
-| rpi-imager                 | AppImage | Raspberry Pi Imaging Utility  |
-| virtctl                    | Binary   | Kubernetes Virtualization CLI |
+See the [`pkgs/`](./pkgs) directory for the current list — each subdirectory is
+one package, named after its `pkgname`. Its `PKGBUILD` records the upstream
+source and version.
 
 ## How It Works
 
