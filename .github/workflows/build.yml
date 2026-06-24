@@ -22,20 +22,17 @@ concurrency:
 
 jobs:
   prepare:
-    # Fork (untrusted) PRs must never run on the self-hosted pool — building
-    # arbitrary PKGBUILDs is RCE on the runner host. Only push/dispatch and
-    # same-repo (trusted) PRs run here; a fork PR skips `prepare`, which cascades
-    # to skip build/build-heavy/publish. Add a separate ubuntu-latest workflow if
-    # you want fork-PR CI.
+    # Fork (untrusted) PRs must never build arbitrary PKGBUILDs unsupervised —
+    # that is RCE on the runner host. Only push/dispatch and same-repo (trusted)
+    # PRs run here; a fork PR skips `prepare`, which cascades to skip
+    # build/publish. Add a separate fork-PR workflow if you want fork-PR CI.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     container: archlinux:base-devel
     permissions:
       contents: write
     outputs:
       matrix: ${{ steps.scan.outputs.matrix }}
-      matrix_heavy: ${{ steps.scan.outputs.matrix_heavy }}
-      heavy_runner: ${{ steps.scan.outputs.heavy_runner }}
       removed: ${{ steps.scan.outputs.removed }}
       run_publish: ${{ steps.scan.outputs.run_publish }}
       checkout_sha: ${{ steps.sha.outputs.checkout_sha }}
@@ -93,7 +90,7 @@ jobs:
   aur-publish:
     needs: prepare
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     container: archlinux:base-devel
     steps:
       - name: Install git
@@ -116,7 +113,7 @@ jobs:
   build:
     needs: [prepare]
     if: ${{ always() && needs.prepare.result == 'success' && fromJson(needs.prepare.outputs.matrix)[0] != null }}
-    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     container: archlinux:base-devel
     steps:
       - name: Install git
@@ -148,53 +145,17 @@ jobs:
           path: pkgs/*/*.pkg.tar.zst
           compression-level: 0
 
-  build-heavy:
-    needs: [prepare]
-    if: ${{ always() && needs.prepare.result == 'success' && fromJson(needs.prepare.outputs.matrix_heavy)[0] != null }}
-    runs-on: ${{ needs.prepare.outputs.heavy_runner }}
-    container: archlinux:base-devel
-    steps:
-      - name: Install git
-        run: pacman -Sy --noconfirm git
-
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare.outputs.checkout_sha }}
-
-      - name: Setup environment
-        run: ./scripts/ci/setup.sh
-
-      - name: Build packages sequentially
-        env:
-          PACKAGES: ${{ needs.prepare.outputs.matrix_heavy }}
-        run: |
-          # Build packages one by one, each gets added to local repo
-          # so subsequent packages can depend on earlier ones
-          for pkg in $(echo "$PACKAGES" | jq -r '.[]'); do
-            echo "::group::Building $pkg"
-            ./scripts/ci/build.sh "$pkg"
-            echo "::endgroup::"
-          done
-
-      - name: Upload Package Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: packages-heavy
-          path: pkgs/*/*.pkg.tar.zst
-          compression-level: 0
-
   publish:
-    needs: [prepare, build, build-heavy]
-    # Run if prepare succeeded, and both build jobs either succeeded or were skipped, AND we are told to publish
+    needs: [prepare, build]
+    # Run if prepare succeeded, the build job either succeeded or was skipped, AND we are told to publish
     if: |
       always() &&
       needs.prepare.result == 'success' &&
       (needs.build.result == 'success' || needs.build.result == 'skipped') &&
-      (needs.build-heavy.result == 'success' || needs.build-heavy.result == 'skipped') &&
       needs.prepare.outputs.run_publish == 'true' &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main'
-    runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     container: archlinux:base-devel
     permissions:
       contents: write
@@ -225,13 +186,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: packages
-          path: repo-artifacts
-
-      - name: Download Heavy Built Packages
-        if: needs.build-heavy.result == 'success'
-        uses: actions/download-artifact@v4
-        with:
-          name: packages-heavy
           path: repo-artifacts
 
       - name: Finalize Repository
