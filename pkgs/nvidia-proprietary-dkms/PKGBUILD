@@ -3,7 +3,7 @@
 # Workaround for GSP heartbeat bug in nvidia-open:
 # https://github.com/NVIDIA/open-gpu-kernel-modules/issues/1064
 pkgname=nvidia-proprietary-dkms
-pkgver=610.43.02
+pkgver=610.43.03
 pkgrel=1
 pkgdesc="NVIDIA proprietary kernel modules (DKMS)"
 arch=('x86_64')
