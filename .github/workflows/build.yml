@@ -89,7 +89,13 @@ jobs:
 
   aur-publish:
     needs: prepare
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Dispatch counts as push here: the watcher's GITHUB_TOKEN push suppresses
+    # `on: push` (GitHub's recursion guard), so its compensating
+    # `gh workflow run` arrives as workflow_dispatch — without this leg,
+    # watcher-driven bumps update the pacman repo but never reach the AUR.
+    # Safe to re-run: aur-publish.sh pushes the current state of every
+    # .aur-marked package, so an already-current package is a no-op.
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     container: archlinux:base-devel
     steps:
