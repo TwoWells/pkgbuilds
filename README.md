@@ -3,7 +3,8 @@
 [![Build packages](https://github.com/TwoWells/pkgbuilds/actions/workflows/build.yml/badge.svg)](https://github.com/TwoWells/pkgbuilds/actions/workflows/build.yml)
 [![Check for Updates](https://github.com/TwoWells/pkgbuilds/actions/workflows/watch.yml/badge.svg)](https://github.com/TwoWells/pkgbuilds/actions/workflows/watch.yml)
 
-Personal Arch Linux package repository with automated builds and version tracking.
+Personal Arch Linux package repository with automated builds, version tracking,
+and AUR publishing.
 
 ## Usage
 
@@ -28,12 +29,31 @@ See the [`pkgs/`](./pkgs) directory for the current list — each subdirectory i
 one package, named after its `pkgname`. Its `PKGBUILD` records the upstream
 source and version.
 
+## Publish Targets
+
+Each package opts into one or both distribution channels via empty marker
+files in its directory:
+
+| Marker   | Behavior                                                      |
+| -------- | ------------------------------------------------------------- |
+| `.local` | Build, sign, and publish to the `[markwells-dev]` pacman repo |
+| `.aur`   | Push `PKGBUILD` + generated `.SRCINFO` to the AUR             |
+
+A package may carry both markers — e.g. a `-bin` package served from the
+pacman repo and mirrored to the AUR. Source packages usually carry `.aur`
+only: the AUR builds from source by design, while the pacman repo ships
+binaries. A package with no marker is inert (kept in-tree but published
+nowhere).
+
 ## How It Works
 
 - **PKGBUILDs** are stored in this repo
 - **Versions are checked** every 30 minutes and updated automatically
-- **GitHub Actions** builds only changed packages in a clean Arch Linux container
+- **GitHub Actions** builds only changed `.local` packages in a clean Arch Linux container
 - **Packages are signed** with GPG and published atomically to GitHub Releases
+- **AUR packages** (`.aur` marker) are pushed to [aur.archlinux.org](https://aur.archlinux.org)
+  on every push to `main` — including watcher-dispatched version bumps — with
+  `.SRCINFO` generated in CI
 - **pacman** syncs directly from the release assets
 
 For CI/CD pipeline details, see the [wiki](https://github.com/TwoWells/pkgbuilds/wiki/CI-CD).
@@ -64,7 +84,11 @@ Common datasources:
 - `npm` - for npm packages
 - `github-releases` - for GitHub releases
 
-3. Commit and push - the package will be automatically detected and built
+3. Add a target marker (`.local`, `.aur`, or both — see
+   [Publish Targets](#publish-targets)); `.local` packages should also carry a
+   `check.sh` smoke test
+
+4. Commit and push - the package will be automatically detected and built
 
 ## Known Issues
 
