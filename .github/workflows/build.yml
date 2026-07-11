@@ -181,7 +181,7 @@ jobs:
         run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
 
       - name: Download Repository DB
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: repo-db
           path: repo
@@ -189,7 +189,7 @@ jobs:
       - name: Download Built Packages
         # Only download if build job ran
         if: needs.build.result == 'success'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: packages
           path: repo-artifacts
