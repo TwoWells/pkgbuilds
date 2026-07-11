@@ -1,0 +1,40 @@
+# Merges dependabot PRs once the "Build packages" run for their branch
+# completes green. Triggered on workflow_run rather than pull_request: a job
+# on the PR itself would appear in the PR's own check list, so a
+# wait-for-checks step would deadlock waiting on itself. GITHUB_TOKEN (unlike
+# OAuth-app tokens) may merge PRs that touch workflow files. The watcher's
+# direct pushes to main are untouched by this.
+#
+# Self-healing on races: if the base moved and the merge is refused,
+# dependabot rebases the PR on its own, CI reruns, and this workflow fires
+# again on the new green run.
+name: Dependabot auto-merge
+
+on:
+  workflow_run:
+    workflows: ['Build packages']
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge the green dependabot PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch="${{ github.event.workflow_run.head_branch }}"
+          pr=$(gh pr list --repo "${{ github.repository }}" --head "$branch" \
+            --json number --jq '.[0].number')
+          if [ -z "$pr" ] || [ "$pr" = "null" ]; then
+            echo "No open PR for $branch — nothing to merge."
+            exit 0
+          fi
+          gh pr merge "$pr" --squash --delete-branch --repo "${{ github.repository }}"
