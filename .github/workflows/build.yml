@@ -40,7 +40,7 @@ jobs:
       - name: Install git
         run: pacman -Sy --noconfirm git
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup environment
         run: ./scripts/ci/setup.sh
@@ -81,7 +81,7 @@ jobs:
         run: ./scripts/ci/prepare.sh
 
       - name: Upload Repository DB
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: repo-db
           path: repo/
@@ -102,7 +102,7 @@ jobs:
       - name: Install git
         run: pacman -Sy --noconfirm git
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.checkout_sha }}
 
@@ -125,7 +125,7 @@ jobs:
       - name: Install git
         run: pacman -Sy --noconfirm git
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.checkout_sha }}
 
@@ -145,7 +145,7 @@ jobs:
           done
 
       - name: Upload Package Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: packages
           path: pkgs/*/*.pkg.tar.zst
@@ -169,7 +169,7 @@ jobs:
       - name: Install git
         run: pacman -Sy --noconfirm git
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.checkout_sha }}
           fetch-depth: 0
