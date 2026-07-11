@@ -81,7 +81,7 @@ jobs:
         run: ./scripts/ci/prepare.sh
 
       - name: Upload Repository DB
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: repo-db
           path: repo/
@@ -145,7 +145,7 @@ jobs:
           done
 
       - name: Upload Package Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: packages
           path: pkgs/*/*.pkg.tar.zst
