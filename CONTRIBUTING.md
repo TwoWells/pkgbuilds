@@ -89,6 +89,23 @@ pkgs/
 4. Add `check.sh` smoke test (for `.local` packages)
 5. Add version check script in `scripts/packages/[pkgname].sh`
 
+### TwoWells upstreams
+
+For an in-house project, follow the release contract and the whole pipeline
+works with zero overrides — copy the `lattice-markdown`/`lattice-markdown-bin`
+pair as templates (source build and prebuilt binary respectively):
+
+- Releases tagged `vX.Y.Z`; the source package builds
+  `--locked` from the tag's archive tarball, so `Cargo.lock` must be committed.
+- The `-bin` package needs a `<name>-x86_64-unknown-linux-gnu.tar.gz` asset
+  with the binary at the archive root, and `LICENSE` present in the tagged
+  tree (fetched separately — release tarballs ship only the binary).
+- The watcher polls every 30 minutes, but in-house releases don't wait for it:
+  share the `DIST_DISPATCH_TOKEN` org secret with the upstream repo and add
+  the `notify-distribution` job to its release workflow (copy it from
+  [Lattice's release.yml](https://github.com/TwoWells/Lattice/blob/main/.github/workflows/release.yml)) —
+  it dispatches `watch.yml` here the moment a release is cut.
+
 ## Automated Updates
 
 Version checks run via GitHub Actions. Add a script in `scripts/packages/`:

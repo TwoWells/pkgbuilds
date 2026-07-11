@@ -1,9 +1,14 @@
 name: Check for Updates
 
+# The schedule is the primary trigger for third-party upstreams (sanoid,
+# keeper-commander, …), which can't announce their releases. TwoWells
+# upstreams don't wait for it: their release workflows dispatch this
+# workflow directly (notify-distribution job + DIST_DISPATCH_TOKEN org
+# secret), so in-house packages update within minutes of a release.
 on:
   schedule:
     - cron: '*/30 * * * *' # Run every 30 minutes
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: # Manual trigger + upstream release dispatch
 
 permissions:
   contents: write
