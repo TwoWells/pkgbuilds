@@ -63,7 +63,7 @@ makedepends=(
     'python-setuptools-scm'
 )
 source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
-sha512sums=('32a66ee1ae8ef30bc9d0b5e17b342e6e10dac20a21ca689cdbbecdc5bcf58f1a60336fa0c0b9e7cca67e546011cc0b05cf12dd9c79eecc1f8d00c61e501ecc95')
+sha512sums=('d786fcf1efb426ace3ba9b2b00511e30f241c5c6fea0a5c6f1f38239d5f6fba18d31d1551cc94c5ecfe8d3ec5efd242a4de9ff78a0948b8650ddf8ba34761ff5')
 
 build() {
     cd "Commander-$pkgver"
