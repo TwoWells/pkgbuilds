@@ -1,7 +1,7 @@
 # Maintainer: TwoWells <mwellsa@gmail.com>
 # shellcheck shell=bash disable=SC2034,SC2154
 pkgname=catenary
-pkgver=2.0.2
+pkgver=2.1.0
 pkgrel=1
 pkgdesc="LSP-powered code intelligence for AI coding agents"
 arch=('x86_64')
