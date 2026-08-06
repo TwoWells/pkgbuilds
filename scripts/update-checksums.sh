@@ -40,6 +40,13 @@ for src in "${source[@]}"; do
     # Expand variables in URL
     url=$(eval echo "$url")
 
+    # git sources are content-addressed by their #commit= fragment — there is
+    # no tarball to hash, and makepkg requires SKIP for them.
+    if [[ "$url" == git+* ]]; then
+        sums+=("'SKIP'")
+        continue
+    fi
+
     echo "Fetching: $url" >&2
     if [[ "$url" == http* ]]; then
         # Determine the local filename (matches what makepkg expects)
@@ -75,8 +82,18 @@ checksums=$(
     echo "${sums[*]}" | tr '\n' ' ' | sed 's/ $//'
 )
 
-# Replace the existing checksum array (handles multi-line)
-# We use perl in slurp mode to handle multi-line checksum arrays
-perl -i -0777 -pe "s/${algo}sums=\\\(.*?\\\)/${algo}sums=($checksums)/sg" "$PKGBUILD_FILE"
+# Replace the existing checksum array (handles multi-line).
+# Pass via env vars so perl handles quoting safely — bash-level escaping in a
+# double-quoted program is how this substitution once matched nothing for
+# years while exiting 0.
+NEWSUMS="${algo}sums=($checksums)" ALGO="$algo" \
+    perl -i -0777 -pe 's/$ENV{ALGO}sums=\(.*?\)/$ENV{NEWSUMS}/s' "$PKGBUILD_FILE"
+
+# The rewrite must be provable, not assumed: a substitution that matched
+# nothing exits 0 too.
+if ! grep -qF "${algo}sums=($checksums)" "$PKGBUILD_FILE"; then
+    echo "Error: rewrite of ${algo}sums in $PKGBUILD_PATH did not take" >&2
+    exit 1
+fi
 
 echo "Updated $algo checksums in $PKGBUILD_PATH" >&2
