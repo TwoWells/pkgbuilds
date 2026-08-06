@@ -42,6 +42,13 @@ if [ -n "$REMOVED_JSON" ] && [ "$REMOVED_JSON" != "[]" ]; then
     else
         echo "Warning: Database not found, cannot remove packages."
     fi
+
+    # Also drop the removed packages' files: migration and manual-publish
+    # runs bulk-download every historical *.pkg.tar.zst into repo/, and the
+    # blanket repo-add below would resurrect the entries just removed.
+    for name in $REMOVED_LIST; do
+        rm -f repo/"${name}"-[0-9]*.pkg.tar.zst repo/"${name}"-[0-9]*.pkg.tar.zst.sig
+    done
 fi
 
 # 3. Sign and Add New Packages
