@@ -13,7 +13,7 @@ depends=(
     'perl-io-stringy'
 )
 source=("https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/${_dist}-${pkgver}.tar.gz")
-sha512sums=('ec99c0220b5f5e11f61967004d23bee7cd6ab40d3266d32ae9c51ad803ac1bd04cfd6e71c370aa98432d02739ab4a82341cb22467f55c8a14839459e3cd92a22')
+sha512sums=('35021488064ba370584184df5af9f1e6d81c58464d17152fdc7a54c2616fcfc0b4e6393bd67cd429da8df567d91a2ea65449977c64604c82cbf7f57fd730ec9b')
 
 build() {
     cd "$_dist-$pkgver"
