@@ -1,3 +1,3 @@
 #!/bin/bash
 
-check_github_release "catenary-bin" "TwoWells/Catenary"
+check_github_release_sidecar "catenary-bin" "TwoWells/Catenary" "catenary-linux-amd64"

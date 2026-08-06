@@ -1,5 +1,5 @@
 # Maintainer: Mark Wells <contact at markwells dot dev>
-# shellcheck shell=bash disable=SC2034,SC2154
+# shellcheck shell=bash disable=SC2034,SC2154,SC2164
 pkgname=sanoid
 pkgver=2.3.0
 pkgrel=1
@@ -23,11 +23,18 @@ optdepends=(
     'lz4: lz4 compression for syncoid'
 )
 backup=('etc/sanoid/sanoid.conf')
-source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
-sha512sums=('b1201cddd5aa04474307e2984a6d3625c54135730663e973c11834bc34c544f7771b1870dcf2820f774817ad2a689c5a2bc602d84b3b8f48db61acb3224edb72')
+makedepends=('git')
+# Upstream attaches no artifacts or digests to its releases, and GitHub's
+# generated tag tarballs are not guaranteed byte-stable — so the source is
+# pinned by commit and verified by git's content addressing (SKIP is sound
+# here: there is no tarball hash that could be). The watcher keeps _commit
+# in step with pkgver.
+_commit=8d4abf14b2bf8d6b98fc8e163fa9895486e8cdeb
+source=("git+$url.git#commit=$_commit")
+sha512sums=('SKIP')
 
 prepare() {
-    cd "$pkgname-$pkgver"
+    cd "$pkgname"
     # Units ship with /usr/sbin paths; this package installs binaries to /usr/bin.
     sed -i 's|/usr/sbin|/usr/bin|g' \
         packages/debian/sanoid.service \
@@ -36,7 +43,7 @@ prepare() {
 }
 
 package() {
-    cd "$pkgname-$pkgver"
+    cd "$pkgname"
 
     install -Dm755 -t "$pkgdir/usr/bin/" sanoid syncoid findoid
 

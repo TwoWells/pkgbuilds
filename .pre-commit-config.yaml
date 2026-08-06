@@ -63,6 +63,10 @@ repos:
         entry: grep -E "(sha256|sha512)sums=.*SKIP"
         language: pygrep
         files: ^pkgs/.*PKGBUILD$
+        # sanoid's source is a git+…#commit= pin — content-addressed by git
+        # itself, so SKIP is sound there (and the only option makepkg allows).
+        # Every excluded PKGBUILD must pin a _commit= for this to stay true.
+        exclude: ^pkgs/sanoid/PKGBUILD$
         description: Ensure no checksums are skipped for security.
 
       - id: enforce-https-sources

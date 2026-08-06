@@ -2,9 +2,11 @@
 
 This guide provides instructions for building, testing, and adding packages to this repository.
 
-For detailed documentation, see the [wiki](https://github.com/TwoWells/pkgbuilds/wiki):
+For detailed documentation, see [PROVENANCE.md](PROVENANCE.md) (checksum
+trust policy — read it before touching any pin) and the
+[wiki](https://github.com/TwoWells/pkgbuilds/wiki):
 
-- [CI/CD Pipeline](https://github.com/TwoWells/pkgbuilds/wiki/CI-CD) — build pipeline, auto-repair, atomic releases
+- [CI/CD Pipeline](https://github.com/TwoWells/pkgbuilds/wiki/CI-CD) — build pipeline, atomic releases
 - [Build Patterns](https://github.com/TwoWells/pkgbuilds/wiki/Build-Patterns) — npm, Python, AppImage, and binary packaging
 
 ## Development Environment
@@ -42,12 +44,18 @@ Common flags:
 ### Updating Checksums
 
 If you change source URLs or manually bump versions, re-pin the checksums.
-`SKIP` is rejected by the `forbid-checksum-skip` pre-commit hook, so checksums
-must be real:
+`SKIP` is rejected by the `forbid-checksum-skip` pre-commit hook (except for
+commit-pinned `git+…#commit=` sources, which are content-addressed and
+individually excluded there), so checksums must be real:
 
 ```bash
 make checksums PKG=<name>   # or: cd pkgs/<name> && updpkgsums
 ```
+
+Note that `updpkgsums` hashes whatever it downloads — fine for local work,
+but the automated bumps pin from published claims instead, and CI hard-fails
+on any mismatch. See [PROVENANCE.md](PROVENANCE.md) before re-pinning to
+"fix" a red build.
 
 ## Repository Structure
 

@@ -3,10 +3,10 @@
 # Contributor: mdaniels5757 <arch at mdaniels dot me>
 # Contributor: ejiek <ejiek@mail.ru>
 # Contributor: jskier <jay @jskier.com>
-# shellcheck shell=bash disable=SC2034,SC2154
+# shellcheck shell=bash disable=SC2034,SC2154,SC2164
 pkgname=keeper-commander
 pkgver=18.0.15
-pkgrel=1
+pkgrel=2
 epoch=1
 pkgdesc="CLI, SDK and interactive shell for Keeper® Password Manager."
 arch=('any')
@@ -62,17 +62,23 @@ makedepends=(
     'python-setuptools'
     'python-setuptools-scm'
 )
-source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
-sha512sums=('160abd21e52f95771377695b4a16d6087a0194f658953c90b1552da83424e68875b08438b42c3d1f83f1754942f6bf4a27d83dbf17da6a2fc4fd2a452e80eeba')
+# Built from the PyPI sdist rather than the GitHub tag archive: PyPI files
+# are immutable and the registry publishes their sha256, so the watcher pins
+# a claim instead of hashing a download (see PROVENANCE.md). The MIT LICENSE
+# is not guaranteed inside the sdist, so it is fetched from the tagged tree.
+source=("https://files.pythonhosted.org/packages/source/k/keepercommander/keepercommander-$pkgver.tar.gz"
+    "LICENSE-$pkgver::https://raw.githubusercontent.com/Keeper-Security/Commander/v$pkgver/LICENSE")
+sha256sums=('6d8aac75025d11e9d4b5deb3e4b32661bf352f51e47e729f7d9a3f5af65fc4ee'
+    'a6538169baa044f5f780a8a4533c9c434e6e3d97ead370d2ad6f280f204389fd')
 
 build() {
-    cd "Commander-$pkgver"
+    cd "keepercommander-$pkgver"
     python -m build --wheel --no-isolation
 }
 
 package() {
-    cd "Commander-$pkgver"
+    cd "keepercommander-$pkgver"
     python -m installer --destdir="$pkgdir" dist/*.whl
-    install -D -m644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -D -m644 "$srcdir/LICENSE-$pkgver" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
 # vim:set ts=2 sw=2 et:
