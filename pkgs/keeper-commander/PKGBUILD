@@ -68,7 +68,7 @@ makedepends=(
 # is not guaranteed inside the sdist, so it is fetched from the tagged tree.
 source=("https://files.pythonhosted.org/packages/source/k/keepercommander/keepercommander-$pkgver.tar.gz"
     "LICENSE-$pkgver::https://raw.githubusercontent.com/Keeper-Security/Commander/v$pkgver/LICENSE")
-sha256sums=('6d8aac75025d11e9d4b5deb3e4b32661bf352f51e47e729f7d9a3f5af65fc4ee'
+sha256sums=('9bd012e2ec82f96411a878e38ece432903f765134b2a76cec6d093f52b8fd924'
     'a6538169baa044f5f780a8a4533c9c434e6e3d97ead370d2ad6f280f204389fd')
 
 build() {
