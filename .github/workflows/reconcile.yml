@@ -1,0 +1,31 @@
+name: Reconcile AUR
+
+# The durable retry for failed publishes. aur-publish can red out inside an
+# AUR maintenance window, and build.yml only fires on push/dispatch — so
+# without this, a transient outage leaves a release silently missing from
+# the AUR until the next unrelated bump (lattice sat at 0.6.0 for days in
+# Aug 2026 exactly this way). This compares what the AUR serves against
+# local state and re-drives build.yml (idempotent aur-publish leg) on drift.
+on:
+  schedule:
+    - cron: '45 1,7,13,19 * * *' # 4x daily, offset from watch.yml's */30
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write # dispatch build.yml on drift
+
+concurrency:
+  group: reconcile-aur-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Compare .aur packages against published AUR state
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./scripts/ci/aur-reconcile.sh

@@ -3,6 +3,13 @@ set -e
 
 # aur-publish.sh: Pushes packages with .aur marker to AUR
 # Requires: AUR_SSH_PRIVATE_KEY environment variable
+#
+# Failure classes (see PROVENANCE.md):
+#   retryable — AUR unreachable or in a maintenance window. Still exits red
+#               (so the alert job fires), and reconcile.yml re-drives the
+#               publish once the AUR is back.
+#   rejected  — the AUR refused the operation (non-fast-forward, permissions,
+#               broken .SRCINFO). Needs a human; retrying cannot help.
 
 echo "==> Publishing to AUR..."
 
@@ -33,8 +40,30 @@ if [ -z "$AUR_PACKAGES" ]; then
     exit 0
 fi
 
-FAILED=()
 PUBLISHED=()
+RETRYABLE=()
+REJECTED=()
+LAST_ERR=""
+
+# Transient AUR failures: the maintenance banner or plain connectivity loss.
+is_transient() {
+    printf '%s' "$1" | grep -qiE 'down due to maintenance|connection (refused|timed out|reset)|could not resolve|operation timed out|remote end hung up|temporarily unavailable'
+}
+
+# Run a git command against the AUR, retrying transient failures with
+# backoff. Leaves the failure text in LAST_ERR for classification.
+aur_git() {
+    local attempt
+    for attempt in 1 2 3; do
+        if LAST_ERR=$("$@" 2>&1); then
+            return 0
+        fi
+        is_transient "$LAST_ERR" || return 1
+        echo "Transient AUR error (attempt $attempt/3): retrying in $((attempt * 20))s..."
+        sleep $((attempt * 20))
+    done
+    return 1
+}
 
 for pkg_dir in $AUR_PACKAGES; do
     pkgname=$(basename "$pkg_dir")
@@ -44,23 +73,26 @@ for pkg_dir in $AUR_PACKAGES; do
     echo "Generating .SRCINFO..."
     if ! su builder -c "cd $pkg_dir && makepkg --printsrcinfo > .SRCINFO"; then
         echo "::error::Failed to generate .SRCINFO for $pkgname"
-        FAILED+=("$pkgname")
+        REJECTED+=("$pkgname")
         continue
     fi
 
-    # Clone or init AUR repo
     aur_repo="/tmp/aur-$pkgname"
     rm -rf "$aur_repo"
 
-    if git clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_repo" 2> /dev/null; then
-        echo "Cloned existing AUR repo"
-    else
-        echo "Creating new AUR repo..."
-        mkdir -p "$aur_repo"
-        cd "$aur_repo"
-        git init
-        git remote add origin "ssh://aur@aur.archlinux.org/${pkgname}.git"
-        cd - > /dev/null
+    # A clone failure is an infrastructure signal, never "package missing":
+    # aurweb serves an empty repository for a name that has no package yet.
+    # (The old fallback here ran `git init`, which made an AUR outage
+    # indistinguishable from a batch of first-time publishes.)
+    if ! aur_git git clone "ssh://aur@aur.archlinux.org/${pkgname}.git" "$aur_repo"; then
+        if is_transient "$LAST_ERR"; then
+            echo "::warning::$pkgname: AUR unreachable — reconcile.yml retries this. ($LAST_ERR)"
+            RETRYABLE+=("$pkgname")
+        else
+            echo "::error::$pkgname: clone failed for a non-transient reason: $LAST_ERR"
+            REJECTED+=("$pkgname")
+        fi
+        continue
     fi
 
     # Copy PKGBUILD and .SRCINFO
@@ -83,18 +115,17 @@ for pkg_dir in $AUR_PACKAGES; do
         version=$(grep -m1 "pkgver = " .SRCINFO | cut -d= -f2 | xargs)
         git commit -m "Update to $version"
 
-        if git push origin master 2> /dev/null || git push origin main 2> /dev/null; then
+        # The AUR only accepts master (empty clones inherit
+        # init.defaultBranch=master from the config above).
+        if aur_git git push origin master; then
             echo "::notice::Published $pkgname to AUR"
             PUBLISHED+=("$pkgname")
+        elif is_transient "$LAST_ERR"; then
+            echo "::warning::$pkgname: AUR unreachable during push — reconcile.yml retries this. ($LAST_ERR)"
+            RETRYABLE+=("$pkgname")
         else
-            # New package - need to push to master
-            if git push -u origin master; then
-                echo "::notice::Published new package $pkgname to AUR"
-                PUBLISHED+=("$pkgname")
-            else
-                echo "::error::Failed to push $pkgname to AUR"
-                FAILED+=("$pkgname")
-            fi
+            echo "::error::$pkgname: push REJECTED: $LAST_ERR"
+            REJECTED+=("$pkgname")
         fi
     fi
     cd - > /dev/null
@@ -104,8 +135,9 @@ done
 echo ""
 echo "==> AUR Publish Summary"
 echo "Published: ${PUBLISHED[*]:-none}"
-echo "Failed: ${FAILED[*]:-none}"
+echo "Retryable (AUR unreachable — reconcile re-drives): ${RETRYABLE[*]:-none}"
+echo "Rejected (needs a human): ${REJECTED[*]:-none}"
 
-if [ ${#FAILED[@]} -gt 0 ]; then
+if [ ${#REJECTED[@]} -gt 0 ] || [ ${#RETRYABLE[@]} -gt 0 ]; then
     exit 1
 fi

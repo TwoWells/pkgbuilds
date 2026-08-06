@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux:base-devel
     permissions:
-      contents: write
+      contents: read
     outputs:
       matrix: ${{ steps.scan.outputs.matrix }}
       removed: ${{ steps.scan.outputs.removed }}
@@ -45,24 +45,10 @@ jobs:
       - name: Setup environment
         run: ./scripts/ci/setup.sh
 
+      # A checksum mismatch fails this step by design (see PROVENANCE.md) —
+      # there is deliberately no auto-repair and no bot push here anymore.
       - name: Lint PKGBUILDs
         run: ./scripts/lint.sh
-
-      - name: Push checksum fixes
-        if: github.event_name != 'pull_request'
-        working-directory: ${{ github.workspace }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          if git diff --name-only | grep -q PKGBUILD; then
-            echo "==> Committing auto-repaired checksums..."
-            git config user.name "Updater Bot"
-            git config user.email "bot@noreply.github.com"
-            git add pkgs/*/PKGBUILD
-            git commit -m "fix: auto-repair stale checksums [skip ci]"
-            git push origin HEAD:${{ github.ref_name }}
-          fi
 
       - name: Record checkout SHA
         id: sha
@@ -115,6 +101,38 @@ jobs:
           AUR_USERNAME: ${{ secrets.AUR_USERNAME }}
           AUR_EMAIL: ${{ secrets.AUR_EMAIL }}
         run: ./scripts/ci/aur-publish.sh
+
+  # A failed aur-publish must reach a human: the red run scrolls away, and
+  # reconcile.yml's retries can exhaust silently inside a long outage. The
+  # issue is the durable signal; close it once the AUR is confirmed current.
+  aur-publish-alert:
+    needs: aur-publish
+    if: ${{ always() && needs.aur-publish.result == 'failure' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the aur-publish failure issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          title="aur-publish is failing"
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          body="aur-publish failed: $run_url
+
+          If the log shows the AUR maintenance banner or connection errors, \
+          reconcile.yml re-drives the publish automatically once the AUR is \
+          back — this issue is the human-visible signal. A *push REJECTED* \
+          error needs investigation. See PROVENANCE.md."
+          existing=$(gh issue list --state open \
+            --search "\"$title\" in:title" \
+            --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "aur-publish failed again: $run_url"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
 
   build:
     needs: [prepare]
