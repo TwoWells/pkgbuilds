@@ -3,8 +3,16 @@
 [![Build packages](https://github.com/TwoWells/pkgbuilds/actions/workflows/build.yml/badge.svg)](https://github.com/TwoWells/pkgbuilds/actions/workflows/build.yml)
 [![Check for Updates](https://github.com/TwoWells/pkgbuilds/actions/workflows/watch.yml/badge.svg)](https://github.com/TwoWells/pkgbuilds/actions/workflows/watch.yml)
 
-Personal Arch Linux package repository with automated builds, version tracking,
-and AUR publishing.
+Arch Linux distribution channel for TwoWells products (catenary, lattice,
+themis) — automated builds, version tracking, AUR publishing, and the
+`[twowells]` pacman repository. Checksum trust policy:
+[PROVENANCE.md](PROVENANCE.md).
+
+> **Renamed 2026-08:** the pacman repository here is now `twowells` (was
+> `markwells-dev`). If you had `[markwells-dev]` configured against this
+> repo, replace the block with the one below. The maintainer's personal
+> packages moved to [m-wells/pkgbuilds](https://github.com/m-wells/pkgbuilds),
+> which carries the `markwells-dev` name onward.
 
 ## Usage
 
@@ -14,7 +22,7 @@ sudo pacman-key --keyserver keys.openpgp.org --recv-keys ED9FEE0BB96D6A5E
 sudo pacman-key --lsign-key ED9FEE0BB96D6A5E
 
 # Add to /etc/pacman.conf (before [core] for priority over official packages)
-[markwells-dev]
+[twowells]
 SigLevel = Required DatabaseOptional
 Server = https://github.com/TwoWells/pkgbuilds/releases/latest/download
 
@@ -89,12 +97,6 @@ Common datasources:
    `check.sh` smoke test
 
 4. Commit and push - the package will be automatically detected and built
-
-## Known Issues
-
-### rpi-imager URL opening
-
-Clicking links within the `rpi-imager` application may fail. This occurs because the AppImage's bundled libraries can break PAM when calling `runuser` to launch a browser. This is an upstream issue; avoid attempting downstream fixes in the wrapper script as they have proven unreliable.
 
 ## Contributing
 

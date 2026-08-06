@@ -1,8 +1,11 @@
 # Provenance & Checksum Policy
 
 How this repository decides which upstream bytes it trusts — for every
-package it builds into the `markwells-dev` pacman repository and publishes
-to the AUR.
+package it builds into the `twowells` pacman repository and publishes to
+the AUR. This repo distributes **TwoWells products** (catenary, lattice,
+themis); the maintainer's personal packages live in
+[m-wells/pkgbuilds](https://github.com/m-wells/pkgbuilds) under the same
+policy.
 
 ## Principles
 
@@ -32,22 +35,17 @@ to the AUR.
 
 ## Package inventory
 
-| Package                     | Upstream artifact             | Trust anchor                                                                                        |
-| --------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
-| catenary                    | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending: upstream will ship a src tarball + sidecar._              |
-| catenary-bin                | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                                 |
-| keeper-commander            | PyPI sdist                    | Class 1 — PyPI's published digest                                                                   |
-| keeper-secrets-manager-core | PyPI sdist                    | Class 1 — PyPI's published digest                                                                   |
-| lattice-markdown            | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending, as above._                                                |
-| lattice-markdown-bin        | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                                 |
-| nvidia-proprietary-dkms     | NVIDIA `.run` installer       | Class 1 — sha512 claim from Arch's `nvidia-utils` packaging recipe (`.SRCINFO` at the matching tag) |
-| perl-config-inifiles        | CPAN dist tarball             | Class 1 — MetaCPAN `checksum_sha256` (legacy sha512 pin converts on the next release)               |
-| sanoid                      | git repository                | Class 1b — commit pin resolved from the release tag                                                 |
-| themis                      | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending, as above._                                                |
-| themis-bin                  | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                                 |
+| Package              | Upstream artifact             | Trust anchor                                                                           |
+| -------------------- | ----------------------------- | -------------------------------------------------------------------------------------- |
+| catenary             | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending: upstream will ship a src tarball + sidecar._ |
+| catenary-bin         | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                    |
+| lattice-markdown     | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending, as above._                                   |
+| lattice-markdown-bin | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                    |
+| themis               | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending, as above._                                   |
+| themis-bin           | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                    |
 
-Secondary `LICENSE` sources (the `-bin` packages and keeper-commander fetch
-the license from the upstream tag, since their primary artifact doesn't
+Secondary `LICENSE` sources (the `-bin` packages fetch the license from
+the upstream tag, since their primary artifact doesn't
 carry it): these are **static pins** — the URL moves with each version but
 the bytes only change when the license text does. The watcher preserves
 them untouched; if the text ever changes, verification hard-fails and a
@@ -55,11 +53,12 @@ human re-pins deliberately.
 
 ## Machinery map
 
-- **Pinning** — `scripts/lib/common.sh`: `check_pypi` / `check_cpan`
-  (registry digests), `check_github_release_sidecar` (release sidecars),
-  `check_github_release_pinned` (commit pins), package-specific logic in
-  `scripts/packages/*.sh` (e.g. nvidia's Arch-recipe read). All pin paths
-  verify their rewrite landed; a substitution that matches nothing fails.
+- **Pinning** — `scripts/lib/common.sh`: `check_github_release_sidecar`
+  (release sidecars) drives every `-bin` package; `check_pypi` /
+  `check_cpan` (registry digests) and `check_github_release_pinned`
+  (commit pins) are kept as twins with m-wells/pkgbuilds' copy. All pin
+  paths verify their rewrite landed; a substitution that matches nothing
+  fails.
 - **Verification** — `scripts/lint.sh` runs `makepkg --verifysource` for
   every package on every build; any mismatch fails the run.
 - **Hygiene** — `.pre-commit-config.yaml`: `forbid-checksum-skip` rejects
@@ -83,8 +82,8 @@ Pick the strongest anchor available, in this order:
    TwoWells upstreams the release contract requires sidecars — see
    CONTRIBUTING.md.
 3. **Another distro's reviewed pin** (e.g. Arch's packaging repo) when the
-   upstream publishes nothing: copy their claim, like
-   `scripts/packages/nvidia-proprietary-dkms.sh`.
+   upstream publishes nothing: copy their claim — m-wells/pkgbuilds'
+   nvidia watcher is the reference implementation.
 4. **Commit pin** for tag-only upstreams with no stable artifacts: use
    `check_github_release_pinned`, set `_commit=` + `SKIP` in the PKGBUILD,
    and add the PKGBUILD to `forbid-checksum-skip`'s exclude list.

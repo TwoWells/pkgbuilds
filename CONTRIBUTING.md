@@ -83,11 +83,11 @@ pkgs/
 | `.aur`   | Push PKGBUILD to AUR                 |
 
 > **Repository name:** the pacman repo and its database are named
-> `markwells-dev` (`markwells-dev.db`), set via `REPO_NAME` in
-> `scripts/lib/common.sh`. This is intentionally _not_ the GitHub org name
-> (`TwoWells`): the org was renamed, the published database was not. Do not
-> rename it to match the org — that breaks installed users' `pacman.conf` and
-> the `[markwells-dev]` Server/database lookups.
+> `twowells` (`twowells.db`), set via `REPO_NAME` in
+> `scripts/lib/common.sh`. It was `markwells-dev` until the 2026-08 split;
+> that name (and the personal packages) moved to
+> [m-wells/pkgbuilds](https://github.com/m-wells/pkgbuilds), and
+> `OLD_REPO_NAME` here drove the one-time database migration.
 
 ## Adding a New Package
 
