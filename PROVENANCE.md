@@ -35,14 +35,14 @@ policy.
 
 ## Package inventory
 
-| Package              | Upstream artifact             | Trust anchor                                                                           |
-| -------------------- | ----------------------------- | -------------------------------------------------------------------------------------- |
-| catenary             | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending: upstream will ship a src tarball + sidecar._ |
-| catenary-bin         | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                    |
-| lattice-markdown     | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending, as above._                                   |
-| lattice-markdown-bin | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                    |
-| themis               | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending, as above._                                   |
-| themis-bin           | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                    |
+| Package              | Upstream artifact             | Trust anchor                                                                                         |
+| -------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------- |
+| catenary             | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Final: upstream archived October 2026 at v2.1.2; no src tarball will ship._ |
+| catenary-bin         | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                                  |
+| lattice-markdown     | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending, as above._                                                 |
+| lattice-markdown-bin | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                                  |
+| themis               | GitHub tag archive (codeload) | Class 2 — TOFU at bump. _Class 1 pending, as above._                                                 |
+| themis-bin           | GitHub release asset          | Class 1 — release `.sha256` sidecar                                                                  |
 
 Secondary `LICENSE` sources (the `-bin` packages fetch the license from
 the upstream tag, since their primary artifact doesn't

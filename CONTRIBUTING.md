@@ -61,11 +61,11 @@ on any mismatch. See [PROVENANCE.md](PROVENANCE.md) before re-pinning to
 
 ```text
 pkgs/
-├── gemini-cli/
+├── catenary-bin/
 │   ├── PKGBUILD
 │   ├── .local           # ← build + publish to GitHub releases
 │   └── check.sh
-├── keeper-secrets-manager-helper/
+├── lattice-markdown/
 │   ├── PKGBUILD
 │   └── .aur             # ← push to AUR only
 └── some-package/
