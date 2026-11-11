@@ -5,21 +5,11 @@
   "useTabs": false,
   "printWidth": 100,
   "trailingComma": "none",
-  "plugins": ["prettier-plugin-sh"],
   "overrides": [
     {
       "files": "*.md",
       "options": {
         "proseWrap": "preserve"
-      }
-    },
-    {
-      "files": ["PKGBUILD", "*.sh"],
-      "options": {
-        "parser": "sh",
-        "tabWidth": 4,
-        "useTabs": false,
-        "keepPadding": false
       }
     }
   ]
